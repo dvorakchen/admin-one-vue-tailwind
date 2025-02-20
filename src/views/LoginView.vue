@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
 import SectionFullScreen from '@/components/SectionFullScreen.vue'
@@ -10,17 +10,63 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import { http } from '@/net/http'
+import { useMainStore } from '@/stores/main'
+
+const mainStore = useMainStore()
+onMounted(async () => {
+  //  clean auth
+  mainStore.clearUser()
+})
+
+const loading = ref(false)
 
 const form = reactive({
-  login: 'john.doe',
-  pass: 'highly-secure-password-fYjUw-',
+  login: 'dvorak',
+  pass: '',
   remember: true
 })
 
 const router = useRouter()
 
-const submit = () => {
-  router.push('/dashboard')
+const submit = async () => {
+  if (form.login.trim() === '' || form.pass.trim() === '') {
+    return
+  }
+
+  loading.value = true
+  const res = await http.post('login', {
+    username: form.login,
+    hashed_password: form.pass
+  })
+  switch (res.status) {
+    case 200:
+      {
+        const data = JSON.parse(res.data)
+        const mainStore = useMainStore()
+        mainStore.setUser(data)
+
+        await router.push('/dashboard')
+      }
+      break
+    case 204:
+      {
+        console.warn('用户不存在: ', form.login)
+      }
+      break
+    case 400:
+      {
+        console.warn('账号密码格式有误')
+      }
+      break
+    default:
+      {
+        console.error('服务器发生错误')
+      }
+      break
+  }
+  loading.value = false
+  //
 }
 </script>
 
@@ -56,8 +102,8 @@ const submit = () => {
 
         <template #footer>
           <BaseButtons>
-            <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
+            <BaseButton type="submit" color="info" label="Login" :disabled="loading" />
+            <!-- <BaseButton to="/dashboard" color="info" outline label="Back" /> -->
           </BaseButtons>
         </template>
       </CardBox>

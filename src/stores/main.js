@@ -3,8 +3,8 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('John Doe')
-  const userEmail = ref('doe.doe.doe@example.com')
+  const userName = ref('')
+  const userEmail = ref('')
 
   const userAvatar = computed(
     () =>
@@ -14,18 +14,27 @@ export const useMainStore = defineStore('main', () => {
       )}`
   )
 
+  const isLoggedIn = computed(() => {
+    return userName.value !== ''
+  })
+
   const isFieldFocusRegistered = ref(false)
 
   const clients = ref([])
   const history = ref([])
 
   function setUser(payload) {
-    if (payload.name) {
-      userName.value = payload.name
+    if (payload.username) {
+      userName.value = payload.username
     }
     if (payload.email) {
       userEmail.value = payload.email
     }
+  }
+
+  function clearUser() {
+    userName.value = ''
+    userEmail.value = ''
   }
 
   function fetchSampleClients() {
@@ -54,10 +63,12 @@ export const useMainStore = defineStore('main', () => {
     userName,
     userEmail,
     userAvatar,
+    isLoggedIn,
     isFieldFocusRegistered,
     clients,
     history,
     setUser,
+    clearUser,
     fetchSampleClients,
     fetchSampleHistory
   }

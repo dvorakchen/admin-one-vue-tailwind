@@ -17,7 +17,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 const mainStore = useMainStore()
 
 const profileForm = reactive({
-  name: mainStore.userName,
+  username: mainStore.userName,
   email: mainStore.userEmail
 })
 
