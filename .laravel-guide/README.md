@@ -9,7 +9,7 @@ This guide will help you integrate your Laravel application with [Admin One - fr
 - Built with **Vue.js 3**, **Tailwind CSS 3** framework & **Composition API**
 - **Laravel** build tools
 - **Laravel Breeze** with **Inertia + Vue** stack
-- **SFC** `<script setup>` [Info](https://v3.vuejs.org/api/sfc-script-setup.html)
+- **SFC** `<script setup lang="ts">` [Info](https://v3.vuejs.org/api/sfc-script-setup.html)
 - **Pinia** state library (official Vuex 5)
 - **Dark mode**
 - **Styled** scrollbars
@@ -106,7 +106,7 @@ First, copy `src/views/HomeView.vue` (from justboil/admin-one-vue-tailwind proje
 Then, open `resources/js/Pages/HomeView.vue` and add `<Head>`:
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
 // ...
 </script>
@@ -176,10 +176,10 @@ Now, let's update vue files, to make them work with route names and Inertia link
 
 ### resources/js/components/AsideMenuItem.vue
 
-Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup>` and add consts:
+Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup lang="ts">` and add consts:
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
 // import { RouterLink } from "vue-router";
 // ...
@@ -206,10 +206,10 @@ In `<template>` section:
 
 ### resources/js/components/BaseButton.vue
 
-Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup>`:
+Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup lang="ts">`:
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
 // import { RouterLink } from "vue-router";
 // ...
@@ -268,10 +268,10 @@ Remove `:to` and replace `:href` in `<component>` with `:href="routeName ? route
 
 ### resources/js/components/NavBarItem.vue
 
-Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup>`:
+Replace `RouterLink` imported from `vue-router` with `Link` import in `<script setup lang="ts">`:
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { Link } from '@inertiajs/vue3'
 // import { RouterLink } from "vue-router";
 // ...
@@ -301,7 +301,7 @@ Then, remove `:to` attribute and set `:href` attribute to `:href="itemHref"` in 
 ### resources/js/layouts/LayoutAuthenticated.vue
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // Remove vue-router stuff:
 
 // import { useRouter } from 'vue-router'
@@ -342,7 +342,7 @@ const menuClick = (event, item) => {
 Let's fetch user avatar initials based on username stored in database.
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -360,7 +360,7 @@ const userName = computed(() => usePage().props.auth.user.name)
 ### resources/js/components/NavBarItem.vue
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // Add usePage:
 import { usePage } from '@inertiajs/vue3'
 // Remove unused useMainStore:
@@ -432,7 +432,7 @@ window.onresize = () => layoutStore.responsiveLayoutControl()
 Replace contents of `resources/js/layouts/LayoutAuthenticated.vue` with contents of `src/js/layouts/LayoutAuthenticated.vue` (from the Premium version)
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // Replace router use:
 
 // import { useRouter } from "vue-router";

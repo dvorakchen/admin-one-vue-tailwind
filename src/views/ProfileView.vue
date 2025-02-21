@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { reactive } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/stores/main.ts'
 import { mdiAccount, mdiMail, mdiAsterisk, mdiFormTextboxPassword, mdiGithub } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -17,8 +17,8 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 const mainStore = useMainStore()
 
 const profileForm = reactive({
-  username: mainStore.userName,
-  email: mainStore.userEmail
+  username: mainStore.username,
+  email: mainStore.email
 })
 
 const passwordForm = reactive({

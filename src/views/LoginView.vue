@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiAccount, mdiAsterisk } from '@mdi/js'
@@ -10,8 +10,11 @@ import FormControl from '@/components/FormControl.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import BaseButtons from '@/components/BaseButtons.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
-import { http } from '@/net/http'
-import { useMainStore } from '@/stores/main'
+import { http } from '@/net/http.ts'
+import { useMainStore } from '@/stores/main.ts'
+import bcypt from 'bcryptjs'
+import { blake3 } from '@noble/hashes/blake3'
+import aesjs from 'aes-js'
 
 const mainStore = useMainStore()
 onMounted(async () => {
@@ -34,10 +37,15 @@ const submit = async () => {
     return
   }
 
+  let hashed_password = aesjs.utils.hex.fromBytes(blake3(form.pass.trim()))
+  hashed_password = bcypt.hashSync(hashed_password, 12)
+
+  console.log(hashed_password)
+
   loading.value = true
   const res = await http.post('login', {
     username: form.login,
-    hashed_password: form.pass
+    hashed_password: hashed_password
   })
   switch (res.status) {
     case 200:
@@ -57,6 +65,11 @@ const submit = async () => {
     case 400:
       {
         console.warn('账号密码格式有误')
+      }
+      break
+    case 401:
+      {
+        console.warn('密码错误')
       }
       break
     default:

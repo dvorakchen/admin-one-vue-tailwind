@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useForm, Head, Link } from '@inertiajs/vue3'
 import { mdiEmail } from '@mdi/js'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'

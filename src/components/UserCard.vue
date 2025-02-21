@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/stores/main.ts'
 import { mdiCheckDecagram } from '@mdi/js'
 import BaseLevel from '@/components/BaseLevel.vue'
 import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'
@@ -10,7 +10,7 @@ import PillTag from '@/components/PillTag.vue'
 
 const mainStore = useMainStore()
 
-const userName = computed(() => mainStore.userName)
+const userName = computed(() => mainStore.username)
 
 const userSwitchVal = ref(false)
 </script>

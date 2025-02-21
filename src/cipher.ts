@@ -1,19 +1,18 @@
 import aesjs from 'aes-js'
-import { pad, unpad } from 'pkcs7'
 
-const AES_KEY = import.meta.env.VITE_AES_KEY
-const AES_IV = import.meta.env.VITE_AES_IV
+const AES_KEY = import.meta.env.VITE_AES_KEY ?? ''
+const AES_IV = import.meta.env.VITE_AES_IV ?? ''
 
 /**
  * encrypt plain text
  * @param {string} plaintext plain text
  * @returns cipher text hex format
  */
-export function encrypt(plaintext) {
+export function encrypt(plaintext: string) {
   const aes = getEncrypter()
 
   let text = aesjs.utils.utf8.toBytes(plaintext)
-  text = pad(text)
+  text = aesjs.padding.pkcs7.pad(text)
 
   const cipherText = aes.encrypt(text)
   return aesjs.utils.hex.fromBytes(cipherText)
@@ -24,12 +23,12 @@ export function encrypt(plaintext) {
  * @param {string} ciphertext cipher text hex format
  * @returns plain text
  */
-export function decrypt(ciphertext) {
+export function decrypt(ciphertext: string) {
   const aes = getDecrypter()
 
   let bytes = aesjs.utils.hex.toBytes(ciphertext)
   let plaintext = aes.decrypt(bytes)
-  plaintext = unpad(plaintext)
+  plaintext = aesjs.padding.pkcs7.strip(plaintext)
 
   return aesjs.utils.utf8.fromBytes(plaintext)
 }

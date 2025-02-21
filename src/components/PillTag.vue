@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import { colorsBgLight, colorsOutline } from '@/colors.js'
+import { colorsBgLight, colorsOutline } from '@/colors.ts'
 import PillTagPlain from '@/components/PillTagPlain.vue'
 
 const props = defineProps({

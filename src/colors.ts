@@ -33,7 +33,12 @@ export const colorsOutline = {
   info: [colorsText.info, 'border-blue-500']
 }
 
-export const getButtonColor = (color, isOutlined, hasHover, isActive = false) => {
+export const getButtonColor = (
+  color: string,
+  isOutlined: boolean,
+  hasHover: boolean,
+  isActive = false
+) => {
   const colors = {
     ring: {
       white: 'ring-gray-200 dark:ring-gray-500',
@@ -108,22 +113,24 @@ export const getButtonColor = (color, isOutlined, hasHover, isActive = false) =>
     }
   }
 
-  if (!colors.bg[color]) {
+  if (!(color in colors.bg)) {
     return color
   }
 
   const isOutlinedProcessed = isOutlined && ['white', 'whiteDark', 'lightDark'].indexOf(color) < 0
 
-  const base = [colors.borders[color], colors.ring[color]]
+  const base = [(colors.borders as any)[color], (colors.ring as any)[color]]
 
   if (isActive) {
-    base.push(colors.active[color])
+    base.push((colors.active as any)[color])
   } else {
-    base.push(isOutlinedProcessed ? colors.text[color] : colors.bg[color])
+    base.push(isOutlinedProcessed ? (colors.text as any)[color] : (colors.bg as any)[color])
   }
 
   if (hasHover) {
-    base.push(isOutlinedProcessed ? colors.outlineHover[color] : colors.bgHover[color])
+    base.push(
+      isOutlinedProcessed ? (colors.outlineHover as any)[color] : (colors.bgHover as any)[color]
+    )
   }
 
   return base

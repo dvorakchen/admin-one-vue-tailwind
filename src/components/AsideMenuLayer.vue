@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { mdiLogout, mdiClose } from '@mdi/js'
 import { computed } from 'vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'

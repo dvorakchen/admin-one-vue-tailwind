@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, useSlots } from 'vue'
 import { mdiClose } from '@mdi/js'
-import { colorsBgLight, colorsOutline } from '@/colors.js'
+import { colorsBgLight, colorsOutline } from '@/colors.ts'
 import BaseLevel from '@/components/BaseLevel.vue'
 import BaseIcon from '@/components/BaseIcon.vue'
 import BaseButton from '@/components/BaseButton.vue'

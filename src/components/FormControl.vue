@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/stores/main.ts'
 import FormControlIcon from '@/components/FormControlIcon.vue'
 
 const props = defineProps({

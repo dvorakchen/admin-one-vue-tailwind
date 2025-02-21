@@ -84,7 +84,7 @@ module.exports = {
 #### In App.vue
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // import { useDarkModeStore } from '@/stores/darkMode.js'
 // import { darkModeKey } from '@/config.js'
 
@@ -243,7 +243,7 @@ Then, wrap the entire template with `<div>` and replace `<LayoutGuest>` with `<N
 **Why we need a div wrapper?** If you use `<NuxtLayout>` within your pages, make sure it is not the root element (or disable layout/page transitions) &mdash; [Info](https://v3.nuxtjs.org/guide/directory-structure/layouts#overriding-a-layout-on-a-per-page-basis)
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // import LayoutGuest from '@/layouts/LayoutGuest.vue'
 // ...
 </script>
@@ -264,7 +264,7 @@ Copy `views/HomeView.vue` to `pages/dashboard.vue`
 Then, wrap the entire template with `<div>` and replace `<LayoutGuest>` with `<NuxtLayout>` with a `name` prop.
 
 ```vue
-<script setup>
+<script setup lang="ts">
 // import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 // ...
 </script>
@@ -284,7 +284,7 @@ Details are coming soon...
 
 ## Remove/update imports
 
-Nuxt automatically imports any components in your `components/` directory. So, you may safely remove that imports from `<script setup>`. The only exception is for `components/Charts`, so charts import should be left as is.
+Nuxt automatically imports any components in your `components/` directory. So, you may safely remove that imports from `<script setup lang="ts">`. The only exception is for `components/Charts`, so charts import should be left as is.
 
 ## Contributions open
 

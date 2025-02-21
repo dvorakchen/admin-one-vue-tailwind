@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { containerMaxW } from '@/config.js'
 import BaseLevel from '@/components/BaseLevel.vue'
 import JustboilLogo from '@/components/JustboilLogo.vue'

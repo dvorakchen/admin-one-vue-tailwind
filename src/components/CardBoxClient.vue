@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { mdiTrendingDown, mdiTrendingUp, mdiTrendingNeutral } from '@mdi/js'
 import CardBox from '@/components/CardBox.vue'

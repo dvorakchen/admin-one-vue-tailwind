@@ -3,19 +3,16 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('')
-  const userEmail = ref('')
+  const username = ref('')
+  const email = ref('')
 
   const userAvatar = computed(
     () =>
-      `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail.value.replace(
-        /[^a-z0-9]+/gi,
-        '-'
-      )}`
+      `https://api.dicebear.com/7.x/avataaars/svg?seed=${email.value.replace(/[^a-z0-9]+/gi, '-')}`
   )
 
   const isLoggedIn = computed(() => {
-    return userName.value !== ''
+    return username.value !== ''
   })
 
   const isFieldFocusRegistered = ref(false)
@@ -23,18 +20,18 @@ export const useMainStore = defineStore('main', () => {
   const clients = ref([])
   const history = ref([])
 
-  function setUser(payload) {
+  function setUser(payload: any) {
     if (payload.username) {
-      userName.value = payload.username
+      username.value = payload.username
     }
     if (payload.email) {
-      userEmail.value = payload.email
+      email.value = payload.email
     }
   }
 
   function clearUser() {
-    userName.value = ''
-    userEmail.value = ''
+    username.value = ''
+    email.value = ''
   }
 
   function fetchSampleClients() {
@@ -60,8 +57,8 @@ export const useMainStore = defineStore('main', () => {
   }
 
   return {
-    userName,
-    userEmail,
+    username,
+    email,
     userAvatar,
     isLoggedIn,
     isFieldFocusRegistered,

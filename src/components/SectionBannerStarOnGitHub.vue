@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { mdiGithub } from '@mdi/js'
 import BaseButton from '@/components/BaseButton.vue'
 import SectionBanner from '@/components/SectionBanner.vue'
-import { gradientBgPinkRed } from '@/colors'
+import { gradientBgPinkRed } from '@/colors.ts'
 </script>
 
 <template>

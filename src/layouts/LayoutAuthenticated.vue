@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -11,7 +11,7 @@ import NavBar from '@/components/NavBar.vue'
 import NavBarItemPlain from '@/components/NavBarItemPlain.vue'
 import AsideMenu from '@/components/AsideMenu.vue'
 import FooterBar from '@/components/FooterBar.vue'
-import { useMainStore } from '@/stores/main'
+import { useMainStore } from '@/stores/main.ts'
 
 const layoutAsidePadding = 'xl:pl-60'
 

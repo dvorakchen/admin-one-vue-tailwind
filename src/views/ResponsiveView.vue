@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionMain from '@/components/SectionMain.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'

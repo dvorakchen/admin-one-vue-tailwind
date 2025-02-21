@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { mdiUpload } from '@mdi/js'
 import { computed, ref, watch } from 'vue'
 import BaseButton from '@/components/BaseButton.vue'

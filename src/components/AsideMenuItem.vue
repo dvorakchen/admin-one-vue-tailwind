@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { mdiMinus, mdiPlus } from '@mdi/js'
-import { getButtonColor } from '@/colors.js'
+import { getButtonColor } from '@/colors.ts'
 import BaseIcon from '@/components/BaseIcon.vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
 
