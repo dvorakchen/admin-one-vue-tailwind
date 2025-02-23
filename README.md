@@ -115,19 +115,19 @@ Get code & install. Then `dev` or `build` with [Vite](#vite-builds) or integrate
 #### Hot-reloads for development
 
 ```
-npm run dev
+bun dev
 ```
 
 #### Builds and minifies for production
 
 ```
-npm run build
+bun run build
 ```
 
 #### Serves recently built app
 
 ```
-npm run preview
+bun run preview
 ```
 
 ### Linting
@@ -135,7 +135,7 @@ npm run preview
 #### Lint
 
 ```
-npm run lint
+bun run lint
 ```
 
 ### Nuxt 3.x integration
