@@ -13,8 +13,13 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import { z } from 'zod'
+import { useNotificationStore } from '@/stores/notifications.ts'
+import { http } from '@/net/http.ts'
+import { ChangePwdReq } from '@/net/models'
 
 const mainStore = useMainStore()
+const notifiStore = useNotificationStore()
 
 const profileForm = reactive({
   username: mainStore.username,
@@ -31,8 +36,26 @@ const submitProfile = () => {
   mainStore.setUser(profileForm)
 }
 
+const pwdValidator = z.object({
+  password_current: z.string().min(6),
+  password: z.string().min(6),
+  password_confirmation: z.string().min(6)
+})
+
 const submitPass = () => {
-  //
+  let res = pwdValidator.safeParse(passwordForm.value)
+  if (!res.success || passwordForm.value.password !== passwordForm.value.password_confirmation) {
+    notifiStore.push({
+      color: 'warning',
+      message: '密码长度至少 6 位，或者密码有误'
+    })
+    return
+  }
+
+  http.post('changepwd', {
+    hashed_password_current: passwordForm.value.password_current,
+    hashed_password_new: passwordForm.value.password
+  } as ChangePwdReq)
 }
 </script>
 
@@ -59,12 +82,12 @@ const submitPass = () => {
             <FormFilePicker label="Upload" />
           </FormField>
 
-          <FormField label="Name" help="Required. Your name">
+          <FormField label="Name" help="Your name">
             <FormControl
-              v-model="profileForm.name"
+              v-model="profileForm.username"
               :icon="mdiAccount"
               name="username"
-              required
+              :disabled="true"
               autocomplete="username"
             />
           </FormField>

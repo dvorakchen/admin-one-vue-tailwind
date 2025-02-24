@@ -1,10 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { type LogInRes } from '@/net/models.ts'
+
+const AUTH_STORAGE_KEY = 'auth_storage_key'
 
 export const useMainStore = defineStore('main', () => {
   const username = ref('')
   const email = ref('')
+
+  const cache = localStorage.getItem(AUTH_STORAGE_KEY)
+  if (cache !== null) {
+    const logInInfo: LogInRes = JSON.parse(cache)
+    username.value = logInInfo.username
+    email.value = logInInfo.email
+  }
 
   const userAvatar = computed(
     () =>
@@ -12,7 +22,7 @@ export const useMainStore = defineStore('main', () => {
   )
 
   const isLoggedIn = computed(() => {
-    return username.value !== ''
+    return Boolean(username.value)
   })
 
   const isFieldFocusRegistered = ref(false)
@@ -20,18 +30,30 @@ export const useMainStore = defineStore('main', () => {
   const clients = ref([])
   const history = ref([])
 
-  function setUser(payload: any) {
+  function setUser(payload: LogInRes): void {
     if (payload.username) {
       username.value = payload.username
     }
     if (payload.email) {
       email.value = payload.email
     }
+
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(payload))
   }
 
-  function clearUser() {
+  function get_jwt_token(): string | null {
+    const cache = localStorage.getItem(AUTH_STORAGE_KEY)
+    if (cache) {
+      return JSON.parse(cache).jwt_token
+    }
+    return null
+  }
+
+  function clearUser(): void {
     username.value = ''
     email.value = ''
+
+    localStorage.removeItem(AUTH_STORAGE_KEY)
   }
 
   function fetchSampleClients() {
@@ -65,6 +87,7 @@ export const useMainStore = defineStore('main', () => {
     clients,
     history,
     setUser,
+    get_jwt_token,
     clearUser,
     fetchSampleClients,
     fetchSampleHistory

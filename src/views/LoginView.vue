@@ -15,8 +15,12 @@ import { useMainStore } from '@/stores/main.ts'
 import bcypt from 'bcryptjs'
 import { blake3 } from '@noble/hashes/blake3'
 import aesjs from 'aes-js'
+import { LogInRes } from '@/net/models'
+import { useNotificationStore } from '@/stores/notifications.ts'
 
 const mainStore = useMainStore()
+const notifiStore = useNotificationStore()
+
 onMounted(async () => {
   //  clean auth
   mainStore.clearUser()
@@ -25,7 +29,7 @@ onMounted(async () => {
 const loading = ref(false)
 
 const form = reactive({
-  login: 'dvorak',
+  login: '',
   pass: '',
   remember: true
 })
@@ -40,17 +44,17 @@ const submit = async () => {
   let hashed_password = aesjs.utils.hex.fromBytes(blake3(form.pass.trim()))
   hashed_password = bcypt.hashSync(hashed_password, 12)
 
-  console.log(hashed_password)
-
   loading.value = true
   const res = await http.post('login', {
     username: form.login,
     hashed_password: hashed_password
   })
+
+  let errorMsg = ''
   switch (res.status) {
     case 200:
       {
-        const data = JSON.parse(res.data)
+        const data: LogInRes = JSON.parse(res.data)
         const mainStore = useMainStore()
         mainStore.setUser(data)
 
@@ -59,27 +63,33 @@ const submit = async () => {
       break
     case 204:
       {
-        console.warn('用户不存在: ', form.login)
+        errorMsg = `用户不存在: ${form.login}`
       }
       break
     case 400:
       {
-        console.warn('账号密码格式有误')
+        errorMsg = '账号密码有误'
       }
       break
     case 401:
       {
-        console.warn('密码错误')
+        errorMsg = '密码错误'
       }
       break
     default:
       {
-        console.error('服务器发生错误')
+        errorMsg = '服务器发生错误'
       }
       break
   }
+
+  if (errorMsg) {
+    notifiStore.push({
+      color: 'warning',
+      message: errorMsg
+    })
+  }
   loading.value = false
-  //
 }
 </script>
 

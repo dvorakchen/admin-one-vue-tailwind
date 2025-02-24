@@ -13,10 +13,12 @@ import AsideMenu from '@/components/AsideMenu.vue'
 import FooterBar from '@/components/FooterBar.vue'
 import { useMainStore } from '@/stores/main.ts'
 
+
 const layoutAsidePadding = 'xl:pl-60'
 
 const darkModeStore = useDarkModeStore()
 const mainStore = useMainStore()
+
 
 const router = useRouter()
 
@@ -80,6 +82,7 @@ const menuClick = (event, item) => {
         @menu-click="menuClick"
         @aside-lg-close-click="isAsideLgActive = false"
       />
+
       <slot />
       <FooterBar>
         Get more with

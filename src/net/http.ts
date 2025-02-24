@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders, type AxiosResponse } from 'axios'
 import { encrypt, decrypt } from '@/cipher.ts'
+import { useMainStore } from '@/stores/main.ts'
 
 const TEXT_PLAIN = 'text/plain;charset=UTF-8'
 const APPLICATION_JSON = 'application/json;charset=UTF-8'
@@ -17,6 +18,12 @@ export const http = axios.create({
 http.interceptors.request.use(
   function (config) {
     config.data = encrypt(JSON.stringify(config.data))
+
+    let token = useMainStore().get_jwt_token() ?? ''
+    if (token) {
+      config.headers.setAuthorization(`Bearer ${token}`)
+    }
+
     config.headers.setContentType(TEXT_PLAIN, true)
     config.headers.set(X_DATE, new Date().toUTCString())
 
