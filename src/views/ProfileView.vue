@@ -17,6 +17,9 @@ import { z } from 'zod'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { http } from '@/net/http.ts'
 import { ChangePwdReq } from '@/net/models'
+import { blake3 } from '@noble/hashes/blake3'
+import aesjs from 'aes-js'
+import bcrypt from 'bcryptjs'
 
 const mainStore = useMainStore()
 const notifiStore = useNotificationStore()
@@ -42,9 +45,13 @@ const pwdValidator = z.object({
   password_confirmation: z.string().min(6)
 })
 
-const submitPass = () => {
-  let res = pwdValidator.safeParse(passwordForm.value)
-  if (!res.success || passwordForm.value.password !== passwordForm.value.password_confirmation) {
+const submitPass = async () => {
+  passwordForm.password_current = passwordForm.password_current.trim()
+  passwordForm.password = passwordForm.password.trim()
+  passwordForm.password_confirmation = passwordForm.password_confirmation.trim()
+
+  let res = pwdValidator.safeParse(passwordForm)
+  if (!res.success || passwordForm.password !== passwordForm.password_confirmation) {
     notifiStore.push({
       color: 'warning',
       message: '密码长度至少 6 位，或者密码有误'
@@ -52,10 +59,23 @@ const submitPass = () => {
     return
   }
 
-  http.post('changepwd', {
-    hashed_password_current: passwordForm.value.password_current,
-    hashed_password_new: passwordForm.value.password
+  let hashed_password_cur = aesjs.utils.hex.fromBytes(blake3(passwordForm.password_current.trim()))
+  hashed_password_cur = bcrypt.hashSync(hashed_password_cur, 12)
+
+  let hashed_password_new = aesjs.utils.hex.fromBytes(blake3(passwordForm.password.trim()))
+
+  const resp = await http.put('change-password', {
+    hashed_password_current: hashed_password_cur,
+    hashed_password_new: hashed_password_new
   } as ChangePwdReq)
+
+  switch (resp.status) {
+    case 200:
+      notifiStore.push({ color: 'success', message: '修改成功' })
+      break
+    default:
+      break
+  }
 }
 </script>
 

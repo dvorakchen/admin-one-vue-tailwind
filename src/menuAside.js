@@ -10,7 +10,8 @@ import {
   mdiTelevisionGuide,
   mdiResponsive,
   mdiPalette,
-  mdiReact
+  mdiReact,
+  mdiFruitCherries
 } from '@mdi/js'
 
 export default [
@@ -18,6 +19,11 @@ export default [
     to: '/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard'
+  },
+  {
+    to: '/memes',
+    label: 'Memes',
+    icon: mdiFruitCherries
   },
   {
     to: '/tables',

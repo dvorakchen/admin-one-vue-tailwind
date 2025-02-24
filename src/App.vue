@@ -2,8 +2,16 @@
 import { RouterView } from 'vue-router'
 import NotificationBar from '@/components/NotificationBar.vue'
 import { useNotificationStore } from '@/stores/notifications.ts'
+import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
+import { setRouter } from '@/net/http.ts'
 
 const notifiStore = useNotificationStore()
+const router = useRouter()
+
+onMounted(() => {
+  setRouter(router)
+})
 </script>
 
 <template>

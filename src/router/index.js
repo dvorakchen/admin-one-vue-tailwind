@@ -18,6 +18,14 @@ const routes = [
   },
   {
     meta: {
+      title: 'Memes'
+    },
+    path: '/memes',
+    name: 'memes',
+    component: () => import('@/views/MemesView.vue')
+  },
+  {
+    meta: {
       title: 'Tables'
     },
     path: '/tables',
