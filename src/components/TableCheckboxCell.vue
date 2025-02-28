@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-
 defineProps({
   type: {
     type: String,
     default: 'td'
+  },
+  checked: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['checked'])
 
-const checked = ref(false)
-
-watch(checked, (newVal) => {
-  emit('checked', newVal)
-})
+function handleChange(ev: Event) {
+  const ele = ev.target! as HTMLInputElement
+  emit('checked', ele.checked)
+}
 </script>
 
 <template>
   <component :is="type" class="lg:w-1">
     <label class="checkbox">
-      <input v-model="checked" type="checkbox" />
+      <input :checked="checked" type="checkbox" @change="handleChange" />
       <span class="check" />
     </label>
   </component>

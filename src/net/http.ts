@@ -30,7 +30,10 @@ export const http = axios.create({
 
 http.interceptors.request.use(
   function (config) {
-    config.data = encrypt(JSON.stringify(config.data))
+    let data = JSON.stringify(config.data)
+    if ((data?.length ?? 0) !== 0) {
+      config.data = encrypt(data)
+    }
 
     let token = useMainStore().get_jwt_token() ?? ''
     if (token) {
@@ -55,7 +58,10 @@ http.interceptors.response.use(
     }
 
     let data = response.data
-    response.data = decrypt(data)
+    if ((data?.length ?? 0) !== 0) {
+      response.data = decrypt(data)
+    }
+
     ;(response.headers as AxiosHeaders).setContentType(APPLICATION_JSON, true)
 
     return response
