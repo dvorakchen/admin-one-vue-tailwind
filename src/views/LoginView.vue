@@ -15,7 +15,7 @@ import { useMainStore } from '@/stores/main.ts'
 import bcypt from 'bcryptjs'
 import { blake3 } from '@noble/hashes/blake3'
 import aesjs from 'aes-js'
-import { LogInRes } from '@/net/models'
+import { LogInRes } from '@/net/models.ts'
 import { useNotificationStore } from '@/stores/notifications.ts'
 
 const mainStore = useMainStore()

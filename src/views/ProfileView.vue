@@ -16,7 +16,7 @@ import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.
 import { z } from 'zod'
 import { useNotificationStore } from '@/stores/notifications.ts'
 import { http } from '@/net/http.ts'
-import { ChangePwdReq } from '@/net/models'
+import { ChangePwdReq } from '@/net/models.ts'
 import { blake3 } from '@noble/hashes/blake3'
 import aesjs from 'aes-js'
 import bcrypt from 'bcryptjs'

@@ -1,0 +1,10 @@
+name: d42x-admin-viewer
+services:
+  admin-viewer:
+    build:
+      context: .
+      target: final
+    container_name: d42x-admin-viewer
+    restart: unless-stopped
+    ports:
+      - 3001:80
