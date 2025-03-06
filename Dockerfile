@@ -1,4 +1,4 @@
-FROM docker.1ms.run/oven/bun:slim as bun
+FROM hub.aiursoft.cn/oven/bun:slim as bun
 
 WORKDIR /app
 
