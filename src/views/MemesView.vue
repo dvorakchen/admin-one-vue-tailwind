@@ -4,7 +4,7 @@ import SectionMain from '@/components/SectionMain.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import { mdiFruitCherries, mdiEye, mdiTrashCan } from '@mdi/js'
 import CardBox from '@/components/CardBox.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useMainStore } from '@/stores/main.ts'
 import format from 'date-format'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
@@ -18,8 +18,7 @@ import CardBoxModal from '@/components/CardBoxModal.vue'
 import { useTemplateRef } from 'vue'
 import { uploadImgs2Bed } from '@/net/superbed.ts'
 import { http } from '@/net/http.ts'
-
-const mainStore = useMainStore()
+import { useNotificationStore } from '@/stores/notifications.ts'
 
 const memeList = ref([])
 
@@ -34,14 +33,18 @@ const filter = reactive({
   status: selectOptions[0]
 })
 
-onMounted(queryList)
+onMounted(async () => {
+  uploadFiles.value = []
+  await queryList()
+})
 
 async function queryList() {
   const status = filter.status.label.toLowerCase() === 'all' ? '' : filter.status.label
-  const resp = await http.get(`memes?page=1&status=${status}`)
+  const resp = await http.get(`memes?page=${currentPage.value}&status=${status}`)
   const data = JSON.parse(resp.data)
 
   currentPage.value = data.page
+  numPages.value = data.total
 
   memeList.value = data.list.map((item) => {
     return {
@@ -51,26 +54,25 @@ async function queryList() {
   })
 }
 
+const numPages = ref(1)
+const currentPage = ref(1)
+watch(currentPage, async (newPage, oldPage) => {
+  queryList()
+  console.log('new: ', newPage), console.log('old: ', oldPage)
+})
+
 const actionBtnDisabled = computed(() => {
   return checkedList.value.size === 0
 })
 
-const items = computed(() => mainStore.clients)
 const checkedList = ref(new Set([]))
 
-const perPage = ref(5)
 const isModalActive = ref(false)
-
-const currentPage = ref(0)
-
-const numPages = computed(() => Math.ceil(items.value.length / perPage.value))
-
-const currentPageHuman = computed(() => currentPage.value + 1)
 
 const pagesList = computed(() => {
   const pagesList = []
 
-  for (let i = 0; i < numPages.value; i++) {
+  for (let i = 1; i <= numPages.value; i++) {
     pagesList.push(i)
   }
 
@@ -120,6 +122,8 @@ function url(file: File): string {
 }
 
 const uploading = ref(false)
+const categories = ref('meme')
+
 async function handleUpload() {
   uploading.value = true
 
@@ -127,22 +131,35 @@ async function handleUpload() {
     return
   }
 
+  const notify = useNotificationStore()
+
   const bedResult = await uploadImgs2Bed(uploadFiles.value)
 
   const postMemes = bedResult.urls.map((url) => {
+    let t = url.split('.')
+    const format = t[t.length - 1].toUpperCase()
+
     return {
-      url: url,
-      hash: '',
-      bed_id: ''
+      categories: categories.value,
+      message: '',
+      memes: [
+        {
+          url: url,
+          cover: '',
+          format,
+          hash: '',
+          bed_id: ''
+        }
+      ]
     }
   })
 
-  const res = await http.post('post-memes', {
-    memes: postMemes
-  })
+  console.log(postMemes)
+  const res = await http.post('post-memes', postMemes)
 
   if (res.status === 200) {
-    console.log('Post OK')
+    uploadFiles.value = []
+    notify.push({ color: 'success', message: 'Post OK' })
   }
 }
 </script>
@@ -172,6 +189,10 @@ async function handleUpload() {
         <div class="w-16 h-16" v-for="file in uploadFiles" :key="file.name">
           <img class="w-full h-full object-contain" :src="url(file)" alt="" />
         </div>
+      </div>
+      <div class="flex">
+        <label for="categories">Categories: </label>
+        <input type="text" id="categories" :value="categories" placeholder="Categories" />
       </div>
       <div>
         <BaseButton label="上传" @click="handleUpload" :disabled="uploading" />
@@ -226,12 +247,15 @@ async function handleUpload() {
               <tr v-for="meme in memeList" :key="meme.id">
                 <TableCheckboxCell @checked="checked($event, meme)" :checked="meme.checked" />
                 <td class="border-b-0 lg:w-6 before:hidden">
-                  <div class="relative w-16 h-16">
-                    <img class="w-full h-full object-contain" :src="meme.url" alt="图片" />
+                  <div class="flex">
+                    <div class="w-16" v-for="img in meme.list" :key="img.id">
+                      <img class="w-full h-full object-contain" :src="img.url" alt="图片" />
+                      {{ img.format }}
+                    </div>
                   </div>
                 </td>
                 <td data-label="Format">
-                  {{ meme.format }}
+                  <!-- {{ meme.format }} -->
                 </td>
                 <td data-label="Status">
                   {{ meme.status }}
@@ -264,13 +288,13 @@ async function handleUpload() {
                   v-for="page in pagesList"
                   :key="page"
                   :active="page === currentPage"
-                  :label="page + 1"
+                  :label="page"
                   :color="page === currentPage ? 'lightDark' : 'whiteDark'"
                   small
                   @click="currentPage = page"
                 />
               </BaseButtons>
-              <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
+              <small>Page {{ currentPage }} of {{ numPages }}</small>
             </BaseLevel>
           </div>
         </CardBox>
