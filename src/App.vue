@@ -1,26 +1,23 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-import NotificationBar from '@/components/NotificationBar.vue'
-import { useNotificationStore } from '@/stores/notifications.ts'
-import { useRouter } from 'vue-router'
-import { onMounted } from 'vue'
-import { setRouter } from '@/net/http.ts'
+import { RouterView } from "vue-router";
+import { useMsgStore } from "./stores/msg";
 
-const notifiStore = useNotificationStore()
-const router = useRouter()
-
-onMounted(() => {
-  setRouter(router)
-})
+const msgStore = useMsgStore();
 </script>
 
 <template>
-  <!-- Notifications -->
-  <div class="fixed top-16 right-8 z-40 flex flex-col gap-2">
-    <div v-for="notifi in notifiStore.notifications">
-      <NotificationBar :color="notifi.color">
-        <b class="mr-2">{{ notifi.message }}</b>
-      </NotificationBar>
+  <div class="toast toast-top toast-end z-50">
+    <div
+      class="alert"
+      :class="{
+        'alert-success': msg.color === 'success',
+        'alert-info': msg.color === 'info',
+        'alert-warning': msg.color === 'warning',
+        'alert-error': msg.color === 'info',
+      }"
+      v-for="msg in msgStore.messages.values()"
+    >
+      <span class="font-bold">{{ msg.value }}</span>
     </div>
   </div>
   <RouterView />

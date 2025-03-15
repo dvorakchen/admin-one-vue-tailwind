@@ -1,72 +1,59 @@
-import axios, { AxiosHeaders, HttpStatusCode, type AxiosResponse } from 'axios'
-import { encrypt, decrypt } from '@/cipher.ts'
-import { useMainStore } from '@/stores/main.ts'
+import axios, { AxiosHeaders, HttpStatusCode, type AxiosResponse } from "axios";
+import { encrypt, decrypt } from "@/utils/cipher";
+import { useAuthStore } from "@/stores/auth";
 
-const TEXT_PLAIN = 'text/plain;charset=UTF-8'
-const APPLICATION_JSON = 'application/json;charset=UTF-8'
+const TEXT_PLAIN = "text/plain;charset=UTF-8";
+const APPLICATION_JSON = "application/json;charset=UTF-8";
 
-const X_DATE = 'X-Date'
+const X_DATE = "X-Date";
 
-/**
- * keep Router
- */
-let _router: any | null = null
-
-/**
- * set router
- * @param router Router
- */
-export function setRouter(router: any): void {
-  _router = router
-}
-
-export const http = axios.create({
+export const serverApi = axios.create({
   baseURL: (import.meta as any).env.VITE_NET_BASE_URL,
   timeout: 10_000,
   validateStatus: function (status) {
-    return status < 500
-  }
-})
+    return status < 500;
+  },
+});
 
-http.interceptors.request.use(
+serverApi.interceptors.request.use(
   function (config) {
-    let data = JSON.stringify(config.data)
+    let data = JSON.stringify(config.data);
     if ((data?.length ?? 0) !== 0) {
-      config.data = encrypt(data)
+      config.data = encrypt(data);
     }
 
-    let token = useMainStore().get_jwt_token() ?? ''
+    let token = useAuthStore().getJwtToken() ?? "";
     if (token) {
-      config.headers.setAuthorization(`Bearer ${token}`)
+      config.headers.setAuthorization(`Bearer ${token}`);
     }
 
-    config.headers.setContentType(TEXT_PLAIN, true)
-    config.headers.set(X_DATE, new Date().toUTCString())
+    config.headers.setContentType(TEXT_PLAIN, true);
+    config.headers.set(X_DATE, new Date().toUTCString());
 
-    return config
+    return config;
   },
   function (error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-http.interceptors.response.use(
+serverApi.interceptors.response.use(
   function (response: AxiosResponse<string, any>) {
     if (response.status === HttpStatusCode.Unauthorized) {
-      // const router = useRouter()
-      _router?.replace('/login')
+      location.href = "/#/login";
+      return response;
     }
 
-    let data = response.data
+    let data = response.data;
     if ((data?.length ?? 0) !== 0) {
-      response.data = decrypt(data)
+      response.data = decrypt(data);
     }
 
-    ;(response.headers as AxiosHeaders).setContentType(APPLICATION_JSON, true)
+    (response.headers as AxiosHeaders).setContentType(APPLICATION_JSON, true);
 
-    return response
+    return response;
   },
   function (error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
