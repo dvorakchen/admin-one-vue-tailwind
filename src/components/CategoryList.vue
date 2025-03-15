@@ -46,7 +46,7 @@ function handleNewCategoryKeyEnter() {
 <template>
   <div class="flex gap-2">
     <span class="" v-for="item in list">
-      <span class="relative badge badge-info pr-6"
+      <span class="relative badge badge-info pr-6 text-nowrap"
         >{{ item }}
         <button
           class="absolute right-0 btn btn-xs btn-circle btn-ghost"

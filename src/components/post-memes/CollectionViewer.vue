@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { DEFAULT_CATEGOIES, FileItem, type FileGroup } from "./models";
+import { getDefaultCategories, FileItem, type FileGroup } from "./models";
 import CategoryList from "../CategoryList.vue";
 import Icon from "../Icon.vue";
 import { mdiClose } from "@mdi/js";
@@ -76,7 +76,7 @@ function handleDrop(ev: DragEvent) {
   if (toGroup === undefined) {
     toGroup = {
       id: toGroupId,
-      categories: DEFAULT_CATEGOIES,
+      categories: getDefaultCategories(),
       files: [],
     } as FileGroup;
     props.fileGroups.push(toGroup);

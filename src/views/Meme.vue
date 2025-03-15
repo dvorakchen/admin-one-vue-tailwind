@@ -6,6 +6,7 @@ import { mdiEmoticonLol } from "@mdi/js";
 import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import PaginationComponent from "@/components/pagination.vue";
 import PostMemes from "@/components/post-memes/Index.vue";
+import { useMsgStore } from "@/stores/msg";
 
 enum FilterStatus {
   Uncensored = "Uncensored",
@@ -14,6 +15,8 @@ enum FilterStatus {
 }
 
 type MemeItem = { checked: boolean } & Meme;
+
+const msgStore = useMsgStore();
 
 const postDialog = useTemplateRef("dialog_post_memes_in_meme_list");
 const isLoading = ref(false);
@@ -85,6 +88,10 @@ function handlePaginationChange(value: number) {
 
 function handleAfterPost() {
   postDialog.value?.close();
+  msgStore.pushMsg({
+    color: "success",
+    value: "提交成功",
+  });
 }
 
 function handleCancelPost() {
@@ -171,11 +178,13 @@ function handleCancelPost() {
                 </span>
               </td>
               <td>
-                <span
-                  class="badge badge-primary"
-                  v-for="cate in meme.categories"
-                  >{{ cate }}</span
-                >
+                <ul class="space-y-1">
+                  <li v-for="cate in meme.categories">
+                    <span class="badge badge-primary text-nowrap">{{
+                      cate
+                    }}</span>
+                  </li>
+                </ul>
               </td>
               <td>
                 <span class="badge badge-info">Published</span>

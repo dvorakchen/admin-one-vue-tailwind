@@ -24,4 +24,8 @@ export class FileItem {
   }
 }
 
-export const DEFAULT_CATEGOIES = ["meme"];
+const DEFAULT_CATEGOIES = ["meme"];
+
+export function getDefaultCategories(): string[] {
+  return DEFAULT_CATEGOIES.slice();
+}

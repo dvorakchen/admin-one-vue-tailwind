@@ -2,7 +2,7 @@
 import { mdiImagePlus } from "@mdi/js";
 import Icon from "../Icon.vue";
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
-import { DEFAULT_CATEGOIES, FileItem, type FileGroup } from "./models";
+import { getDefaultCategories, FileItem, type FileGroup } from "./models";
 import { type PostMemeGroup, type PostMeme } from "@/net/models";
 import CollectionViewer from "./CollectionViewer.vue";
 import { getAllCategories } from "@/net/category";
@@ -11,6 +11,7 @@ import { getFileExtension } from "@/utils/file";
 import { blake3 } from "@noble/hashes/blake3";
 import aesjs from "aes-js";
 import { serverApi } from "@/net/http";
+import { useMsgStore } from "@/stores/msg";
 
 function preventBodyDropEvent(ev: DragEvent) {
   ev.preventDefault();
@@ -30,6 +31,7 @@ onUnmounted(() => {
   document.body.removeEventListener("drop", preventBodyDropEvent);
 });
 
+const msgStore = useMsgStore();
 const fileInput = useTemplateRef("file-input");
 const fileGroups = ref([] as FileGroup[]);
 const loading = ref(false);
@@ -47,13 +49,11 @@ function handleOnDrop(ev: DragEvent) {
   for (const file of files) {
     fileGroups.value.push({
       id: Math.random(),
-      categories: DEFAULT_CATEGOIES,
+      categories: getDefaultCategories(),
       files: [new FileItem(Math.random(), file, null)],
     } as FileGroup);
   }
 }
-
-function handleDragOver(_ev: DragEvent) {}
 
 function handleCollectionChange(newFileGroups: FileGroup[]): void {
   newFileGroups = newFileGroups.filter((t) => t.files.length !== 0);
@@ -65,7 +65,7 @@ function handleSelectFilesChange(ev: Event) {
   for (const file of files) {
     fileGroups.value.push({
       id: Math.random(),
-      categories: DEFAULT_CATEGOIES,
+      categories: getDefaultCategories(),
       files: [new FileItem(Math.random(), file, null)],
     } as FileGroup);
   }
@@ -103,12 +103,15 @@ async function handlePost() {
   });
 
   const res = await serverApi.post("post-memes", groups);
-  if (res.status === 200) {
-    fileGroups.value = [];
-  } else {
+  if (res.status !== 200) {
     console.error("上传服务器失败");
+    msgStore.pushMsg({
+      color: "error",
+      value: "提交失败",
+    });
   }
 
+  fileGroups.value = [];
   loading.value = false;
   emit("afterPost");
 }
@@ -125,7 +128,7 @@ async function postImg2Bed(bed: Bed, file: File): Promise<PostMeme> {
   const p = {
     url: res.url,
     cover: "",
-    format: getFileExtension(res.name),
+    format: getFileExtension(res.name).toUpperCase(),
     hash,
     bed_id: res.id,
   } as PostMeme;
@@ -148,7 +151,6 @@ function handleCancel() {
           class="hover:bg-base-300 flex flex-col items-center justify-center h-full rounded-2xl cursor-pointer"
           @click="handleClickUpload"
           @drop.prevent="handleOnDrop"
-          @dragover.prevent="handleDragOver"
         >
           <Icon :d="mdiImagePlus" :size="50" />
           <h1>Drag and Drop or Click to select images</h1>

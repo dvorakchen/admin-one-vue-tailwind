@@ -35,7 +35,7 @@ function handleCloseMenu() {
 </script>
 
 <template>
-  <div class="relative min-h-screen w-screen lg:w-auto">
+  <div class="relative h-screen w-screen lg:w-auto">
     <div
       ref="aside-menu"
       class="fixed z-40 top-0 h-screen w-60 py-2 pl-2 -translate-x-60 lg:translate-x-0 transition-all"
@@ -47,9 +47,11 @@ function handleCloseMenu() {
       ref="aside-bg"
       @click="handleCloseMenu"
     ></div>
-    <main class="px-8 lg:pl-68 flex flex-col">
+    <main class="px-8 lg:pl-68 flex flex-col h-full">
       <TopNav />
-      <slot />
+      <section class="flex-grow">
+        <slot />
+      </section>
       <Footer />
     </main>
   </div>
