@@ -127,7 +127,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-4 p-4">
+  <div class="flex flex-wrap gap-4 py-4">
     <div
       class="flex flex-col gap-2 rounded-xl border border-primary p-1"
       v-for="group in fileGroups"
