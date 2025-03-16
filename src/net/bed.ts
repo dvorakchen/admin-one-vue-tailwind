@@ -1,5 +1,13 @@
 export interface Bed {
   postImage(img: File): Promise<PostResult>;
+  /**
+   * delete images from bed
+   * @param urls image urls want to delete
+   *
+   * # Return
+   * return whether successfull
+   */
+  deleteImagesFromUrl(urls: string[]): Promise<boolean>;
 }
 
 export type PostResult = {
@@ -38,5 +46,24 @@ export class SuperBed implements Bed {
 
     const data: PostResult = await resp.json();
     return data;
+  }
+
+  async deleteImagesFromUrl(urls: string[]): Promise<boolean> {
+    const data = {
+      token: TOKEN,
+      urls: urls,
+    };
+
+    const resp = await fetch("https://api.superbed.cn/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result: { err: number; msg: string } = await resp.json();
+
+    return result.err === 0;
   }
 }

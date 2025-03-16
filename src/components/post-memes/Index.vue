@@ -2,7 +2,7 @@
 import { mdiImagePlus } from "@mdi/js";
 import Icon from "../Icon.vue";
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
-import { getDefaultCategories, FileItem, type FileGroup } from "./models";
+import { DefaultCategory, FileItem, type FileGroup } from "./models";
 import { type PostMemeGroup, type PostMeme } from "@/net/models";
 import CollectionViewer from "./CollectionViewer.vue";
 import { getAllCategories } from "@/net/category";
@@ -24,11 +24,13 @@ const emit = defineEmits<{
 
 onMounted(async () => {
   document.body.addEventListener("drop", preventBodyDropEvent);
+  document.body.addEventListener("dragover", preventBodyDropEvent);
   await getAllCategories();
 });
 
 onUnmounted(() => {
   document.body.removeEventListener("drop", preventBodyDropEvent);
+  document.body.removeEventListener("dragover", preventBodyDropEvent);
 });
 
 const msgStore = useMsgStore();
@@ -49,7 +51,7 @@ function handleOnDrop(ev: DragEvent) {
   for (const file of files) {
     fileGroups.value.push({
       id: Math.random(),
-      categories: getDefaultCategories(),
+      categories: DefaultCategory.value,
       files: [new FileItem(Math.random(), file, null)],
     } as FileGroup);
   }
@@ -65,7 +67,7 @@ function handleSelectFilesChange(ev: Event) {
   for (const file of files) {
     fileGroups.value.push({
       id: Math.random(),
-      categories: getDefaultCategories(),
+      categories: DefaultCategory.value,
       files: [new FileItem(Math.random(), file, null)],
     } as FileGroup);
   }
@@ -143,7 +145,7 @@ function handleCancel() {
 
 <template>
   <div class="relative flex flex-col gap-4">
-    <h3 class="text-lg font-bold">Post New Memes</h3>
+    <h3 class="text-lg font-bold">Post New Meme(s)</h3>
     <div class="flex flex-col">
       <!-- drag and drop -->
       <div class="w-auto h-32 rounded-2xl border border-primary p-2">
@@ -151,6 +153,7 @@ function handleCancel() {
           class="hover:bg-base-300 flex flex-col items-center justify-center h-full rounded-2xl cursor-pointer"
           @click="handleClickUpload"
           @drop.prevent="handleOnDrop"
+          @dragover.prevent=""
         >
           <Icon :d="mdiImagePlus" :size="50" />
           <h1>Drag and Drop or Click to select images</h1>

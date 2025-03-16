@@ -3,10 +3,11 @@ import TitleBar from "@/components/TitleBar.vue";
 import { serverApi } from "@/net/http";
 import type { Meme, Pagination } from "@/net/models";
 import { mdiEmoticonLol } from "@mdi/js";
-import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
+import { onMounted, reactive, ref, useTemplateRef, watch, computed } from "vue";
 import PaginationComponent from "@/components/pagination.vue";
 import PostMemes from "@/components/post-memes/Index.vue";
 import { useMsgStore } from "@/stores/msg";
+import DeleteMeme from "@/components/DeleteMeme.vue";
 
 enum FilterStatus {
   Uncensored = "Uncensored",
@@ -19,12 +20,21 @@ type MemeItem = { checked: boolean } & Meme;
 const msgStore = useMsgStore();
 
 const postDialog = useTemplateRef("dialog_post_memes_in_meme_list");
+const deleteDialog = useTemplateRef("dialog_delete_meme_in_meme_list");
 const isLoading = ref(false);
 const page = ref(1);
 const size = 20;
 const total = ref(1);
 
 const list = ref([] as MemeItem[]);
+
+const checkedItems = computed(() => {
+  return list.value.filter((t) => t.checked);
+});
+
+const hasCheckedItems = computed(() => {
+  return checkedItems.value.length !== 0;
+});
 
 const filter = reactive({
   status: "All",
@@ -74,6 +84,10 @@ function handlePost() {
   postDialog.value?.showModal();
 }
 
+function handleDelete() {
+  deleteDialog.value?.showModal();
+}
+
 function handleSelectAll(ev: Event) {
   const ele = ev.target as HTMLInputElement;
   list.value.forEach((item) => (item.checked = ele.checked));
@@ -96,6 +110,14 @@ function handleAfterPost() {
 
 function handleCancelPost() {
   postDialog.value?.close();
+}
+
+function handleAfterDelete() {
+  deleteDialog.value?.close();
+}
+
+function handleCancelDelete() {
+  deleteDialog.value?.close();
 }
 </script>
 
@@ -126,6 +148,13 @@ function handleCancelPost() {
           </button>
           <button class="btn btn-accent btn-sm" @click="handlePost">
             Post
+          </button>
+          <button
+            class="btn btn-warning btn-sm"
+            @click="handleDelete"
+            :disabled="!hasCheckedItems"
+          >
+            Delete
           </button>
         </div>
       </div>
@@ -236,6 +265,16 @@ function handleCancelPost() {
     <dialog ref="dialog_post_memes_in_meme_list" class="modal">
       <div class="modal-box w-full md:w-11/12 max-w-5xl h-full md:h-auto">
         <PostMemes @afterPost="handleAfterPost" @cancel="handleCancelPost" />
+      </div>
+    </dialog>
+
+    <dialog ref="dialog_delete_meme_in_meme_list" class="modal">
+      <div class="modal-box w-auto md:w-xl max-w-full">
+        <DeleteMeme
+          :groups="checkedItems"
+          @cancel="handleCancelDelete"
+          @afterDelete="handleAfterDelete"
+        />
       </div>
     </dialog>
   </div>

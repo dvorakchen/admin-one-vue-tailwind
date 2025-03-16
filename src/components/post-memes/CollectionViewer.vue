@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { getDefaultCategories, FileItem, type FileGroup } from "./models";
+import { DefaultCategory, FileItem, type FileGroup } from "./models";
 import CategoryList from "../CategoryList.vue";
 import Icon from "../Icon.vue";
 import { mdiClose } from "@mdi/js";
@@ -76,7 +76,7 @@ function handleDrop(ev: DragEvent) {
   if (toGroup === undefined) {
     toGroup = {
       id: toGroupId,
-      categories: getDefaultCategories(),
+      categories: DefaultCategory.value,
       files: [],
     } as FileGroup;
     props.fileGroups.push(toGroup);
@@ -134,9 +134,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
       :key="group.id"
     >
       <div @drop="handleDrop" @dragover.prevent="" :data-group-id="group.id">
-        <div
-          class="avatar-group -space-x-6 hover:-space-x-0 transition-all min-w-12 min-h-12"
-        >
+        <div class="avatar-group -space-x-6 hover:-space-x-0 min-w-12 min-h-12">
           <div class="avatar rounded-xl" v-for="file in group.files">
             <div class="relative w-12">
               <img
@@ -165,6 +163,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
         <CategoryList
           :groupId="group.id"
           :list="group.categories"
+          :allowAction="true"
           @change="handleCategoryChange"
         />
       </div>
