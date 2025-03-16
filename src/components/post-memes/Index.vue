@@ -80,7 +80,7 @@ async function handlePost() {
 
   const waitGroups = fileGroups.value.map((group) => {
     const waitGroup = {
-      categories: group.categories.join(";"),
+      categories: group.categories,
       message: "",
       waitingMemes: group.files.map((file) => {
         return postImg2Bed(bed, file.file);
