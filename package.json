@@ -19,8 +19,7 @@
     "pinia": "^3.0.1",
     "pkcs7": "^1.0.4",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0",
-    "zod": "^3.24.2"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.12",

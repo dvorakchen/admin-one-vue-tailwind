@@ -111,11 +111,14 @@ async function handlePost() {
       color: "error",
       value: "提交失败",
     });
+    fileGroups.value = [];
+    loading.value = false;
+    emit("afterPost");
+  } else {
+    //  reverse bed
+    const urls = groups.flatMap((g) => g.memes.map((t) => t.url));
+    await bed.deleteImagesFromUrl(urls);
   }
-
-  fileGroups.value = [];
-  loading.value = false;
-  emit("afterPost");
 }
 
 async function postImg2Bed(bed: Bed, file: File): Promise<PostMeme> {
