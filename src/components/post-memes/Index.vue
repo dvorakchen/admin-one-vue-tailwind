@@ -101,24 +101,25 @@ async function handlePost() {
       categories: group.categories,
       message: group.message,
       memes: group.memes,
+      username: "dvorak", // default username
     } as PostMemeGroup;
   });
 
   const res = await serverApi.post("post-memes", groups);
-  if (res.status !== 200) {
+  if (res.status === 200) {
+    fileGroups.value = [];
+    emit("afterPost");
+  } else {
     console.error("上传服务器失败");
     msgStore.pushMsg({
       color: "error",
       value: "提交失败",
     });
-    fileGroups.value = [];
-    loading.value = false;
-    emit("afterPost");
-  } else {
     //  reverse bed
     const urls = groups.flatMap((g) => g.memes.map((t) => t.url));
     await bed.deleteImagesFromUrl(urls);
   }
+  loading.value = false;
 }
 
 async function postImg2Bed(bed: Bed, file: File): Promise<PostMeme> {

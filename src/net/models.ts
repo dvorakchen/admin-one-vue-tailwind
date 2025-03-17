@@ -40,6 +40,7 @@ export type CategoryItem = {
 };
 
 export type PostMemeGroup = {
+  username: string;
   categories: string[];
   message: string;
   memes: PostMeme[];
