@@ -4,6 +4,7 @@ import CategoryList from "./CategoryList.vue";
 import { SuperBed, type Bed } from "@/net/bed";
 import { ref } from "vue";
 import { serverApi } from "@/net/http";
+import ThumbnailList from "./ThumbnailList.vue";
 
 const props = defineProps<{
   groups: Meme[];
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 }>();
 
 const loading = ref(false);
+const isPreview = ref(false);
 
 function handleCancel() {
   emit("cancel");
@@ -40,7 +42,6 @@ async function handleDelete() {
 }
 
 async function deleteSingle(bed: Bed, meme: Meme): Promise<boolean> {
-  console.log("id: ", meme.id);
   // delete from server
   const resp = await serverApi.delete(`memes/${meme.id}`);
   if (resp.status !== 200) {
@@ -57,7 +58,17 @@ async function deleteSingle(bed: Bed, meme: Meme): Promise<boolean> {
 
 <template>
   <main class="relative flex flex-col gap-4">
-    <h1 class="text-error text-xl">Delete Meme(s)</h1>
+    <h1 class="text-error text-xl">
+      Delete Meme(s)
+      <label class="cursor-pointer font-semibold text-sm text-neutral ml-4">
+        Preview:
+        <input
+          type="checkbox"
+          class="toggle toggle-primary ml-1"
+          v-model="isPreview"
+        />
+      </label>
+    </h1>
     <section class="flex flex-wrap gap-4">
       <div
         class="flex flex-col gap-1 w-auto border p-2 rounded-xl border-primary"
@@ -65,16 +76,10 @@ async function deleteSingle(bed: Bed, meme: Meme): Promise<boolean> {
         :key="group.id"
       >
         <CategoryList :list="group.categories" />
-        <div class="flex space-x-2">
-          <a
-            class="max-w-16 max-h-32 overflow-clip"
-            :href="item.url"
-            target="_blank"
-            v-for="item in group.list"
-          >
-            <img class="object-contain" :src="item.url" alt="Img" />
-          </a>
-        </div>
+        <ThumbnailList
+          :imgUrls="group.list.map((t) => t.url)"
+          :preview="isPreview"
+        />
       </div>
     </section>
     <div class="flex gap-2 justify-end">

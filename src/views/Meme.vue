@@ -8,6 +8,7 @@ import PaginationComponent from "@/components/pagination.vue";
 import PostMemes from "@/components/post-memes/Index.vue";
 import { useMsgStore } from "@/stores/msg";
 import DeleteMeme from "@/components/DeleteMeme.vue";
+import ThumbnailList from "@/components/ThumbnailList.vue";
 
 enum FilterStatus {
   Uncensored = "Uncensored",
@@ -22,6 +23,7 @@ const msgStore = useMsgStore();
 const postDialog = useTemplateRef("dialog_post_memes_in_meme_list");
 const deleteDialog = useTemplateRef("dialog_delete_meme_in_meme_list");
 const isLoading = ref(false);
+const isPreview = ref(false);
 const page = ref(1);
 const size = 20;
 const total = ref(1);
@@ -158,6 +160,16 @@ function handleCancelDelete() {
             </select>
           </label>
         </div>
+        <div>
+          <label class="cursor-pointer font-semibold">
+            Preview:
+            <input
+              type="checkbox"
+              class="toggle toggle-primary ml-1"
+              v-model="isPreview"
+            />
+          </label>
+        </div>
         <div class="space-x-2">
           <button
             class="btn btn-primary btn-sm"
@@ -213,18 +225,10 @@ function handleCancelDelete() {
                 </label>
               </th>
               <td>
-                <span class="relative" v-for="img in meme.list">
-                  <div class="avatar">
-                    <div class="mask mask-squircle h-12 w-12">
-                      <a :href="img.url" target="_blank">
-                        <img :src="img.url" alt="Preview Img"
-                      /></a>
-                    </div>
-                    <span class="absolute bottom-0 badge badge-info badge-sm">
-                      {{ img.format }}
-                    </span>
-                  </div>
-                </span>
+                <ThumbnailList
+                  :imgUrls="meme.list.map((t) => t.url)"
+                  :preview="isPreview"
+                />
               </td>
               <td>
                 <ul class="space-y-1">

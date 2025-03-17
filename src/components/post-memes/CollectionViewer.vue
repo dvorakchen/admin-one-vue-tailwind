@@ -135,7 +135,10 @@ function handleCategoryChange(groupId: number, list: string[]) {
     >
       <div @drop="handleDrop" @dragover.prevent="" :data-group-id="group.id">
         <div class="avatar-group -space-x-6 hover:-space-x-0 min-w-12 min-h-12">
-          <div class="avatar rounded-xl" v-for="file in group.files">
+          <div
+            class="avatar rounded-xl transition-all"
+            v-for="file in group.files"
+          >
             <div class="relative w-12">
               <img
                 class="cursor-grab"
