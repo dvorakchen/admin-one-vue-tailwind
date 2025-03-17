@@ -63,17 +63,21 @@ async function nextPage() {
     },
   });
 
-  const data: Pagination<Meme> = JSON.parse(resp.data);
-  page.value = data.page;
-  total.value = data.total;
-  list.value = data.list.map((item) => {
-    return {
-      checked: false,
-      ...item,
-    } as MemeItem;
-  });
-
-  isLoading.value = false;
+  try {
+    const data: Pagination<Meme> = JSON.parse(resp.data);
+    page.value = data.page;
+    total.value = data.total;
+    list.value = data.list.map((item) => {
+      return {
+        checked: false,
+        ...item,
+      } as MemeItem;
+    });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 async function handleQuery() {
@@ -100,20 +104,36 @@ function handlePaginationChange(value: number) {
   page.value = value;
 }
 
-function handleAfterPost() {
+async function handleAfterPost() {
   postDialog.value?.close();
   msgStore.pushMsg({
     color: "success",
     value: "提交成功",
   });
+  await nextPage();
 }
 
 function handleCancelPost() {
   postDialog.value?.close();
 }
 
-function handleAfterDelete() {
+async function handleAfterDelete(success: Meme[], fail: Meme[]) {
+  if (success.length > 0) {
+    msgStore.pushMsg({
+      color: "success",
+      value: `Deleted ${success.length} Meme(s)`,
+    });
+  }
+
+  if (fail.length > 0) {
+    msgStore.pushMsg({
+      color: "error",
+      value: `Delete ${fail.length} Meme(s) failed`,
+    });
+  }
+
   deleteDialog.value?.close();
+  await nextPage();
 }
 
 function handleCancelDelete() {
@@ -188,7 +208,7 @@ function handleCancelDelete() {
                   <input
                     type="checkbox"
                     class="checkbox"
-                    :checked="meme.checked"
+                    v-model="meme.checked"
                   />
                 </label>
               </th>

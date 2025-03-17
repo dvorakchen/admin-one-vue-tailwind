@@ -3,6 +3,7 @@ import type { Meme } from "@/net/models";
 import CategoryList from "./CategoryList.vue";
 import { SuperBed, type Bed } from "@/net/bed";
 import { ref } from "vue";
+import { serverApi } from "@/net/http";
 
 const props = defineProps<{
   groups: Meme[];
@@ -10,7 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "cancel"): void;
-  (e: "afterDelete"): void;
+  (e: "afterDelete", success: Meme[], fail: Meme[]): void;
 }>();
 
 const loading = ref(false);
@@ -21,16 +22,36 @@ function handleCancel() {
 
 async function handleDelete() {
   loading.value = true;
-  const _bed: Bed = new SuperBed();
-  const _urls = props.groups.flatMap((t) => t.list.map((s) => s.url));
+  const bed: Bed = new SuperBed();
 
-  // delete from server
+  const success = [];
+  const fail = [];
 
-  // delete from bed
-  //   const res = await bed.deleteImagesFromUrl(urls);
+  for (const meme of props.groups) {
+    if (await deleteSingle(bed, meme)) {
+      success.push(meme);
+    } else {
+      fail.push(meme);
+    }
+  }
 
   loading.value = false;
-  emit("afterDelete");
+  emit("afterDelete", success, fail);
+}
+
+async function deleteSingle(bed: Bed, meme: Meme): Promise<boolean> {
+  console.log("id: ", meme.id);
+  // delete from server
+  const resp = await serverApi.delete(`memes/${meme.id}`);
+  if (resp.status !== 200) {
+    return false;
+  }
+
+  // delete from bed
+  const urls = meme.list.map((t) => t.url);
+  await bed.deleteImagesFromUrl(urls);
+
+  return true;
 }
 </script>
 
