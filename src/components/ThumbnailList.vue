@@ -23,7 +23,10 @@ function handleShowPreview(ev: MouseEvent) {
 
 <template>
   <div class="relative">
-    <div class="avatar-group -space-x-6 hover:-space-x-0 min-w-12 min-h-12">
+    <div
+      class="avatar-group hover:-space-x-0 min-w-12 min-h-12"
+      :class="{ '-space-x-6': !preview }"
+    >
       <div class="avatar rounded-xl transition-all" v-for="url in imgUrls">
         <div class="relative w-12">
           <a
