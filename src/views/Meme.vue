@@ -287,7 +287,9 @@ function handleCancelDelete() {
     </main>
 
     <dialog ref="dialog_post_memes_in_meme_list" class="modal">
-      <div class="modal-box w-full md:w-11/12 max-w-5xl h-full md:h-auto">
+      <div
+        class="modal-box w-full md:w-11/12 max-w-5xl h-full min-h-96 md:h-auto"
+      >
         <PostMemes @afterPost="handleAfterPost" @cancel="handleCancelPost" />
       </div>
     </dialog>

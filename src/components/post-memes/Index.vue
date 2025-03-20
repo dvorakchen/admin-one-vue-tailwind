@@ -148,9 +148,9 @@ function handleCancel() {
 </script>
 
 <template>
-  <div class="relative flex flex-col gap-4">
+  <div class="relative flex flex-col gap-4 min-h-[inherit]">
     <h3 class="text-lg font-bold">Post New Meme(s)</h3>
-    <div class="flex flex-col">
+    <div class="flex grow flex-col">
       <!-- drag and drop -->
       <div class="w-auto h-32 rounded-2xl border border-primary p-2">
         <div

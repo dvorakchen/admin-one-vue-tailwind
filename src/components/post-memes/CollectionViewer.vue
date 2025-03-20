@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { DefaultCategory, FileItem, type FileGroup } from "./models";
 import CategoryList from "../CategoryList.vue";
 import Icon from "../Icon.vue";
@@ -20,6 +20,8 @@ type DraggingFile = {
   objectUrl: string | null;
 };
 
+const previewUrl = ref("");
+const dialogPreview = useTemplateRef("dialog_post_preview");
 const draggingFile = ref(null as DraggingFile | null);
 
 function handleDragStart(ev: DragEvent) {
@@ -97,6 +99,11 @@ function handleDrop(ev: DragEvent) {
   emit("change", props.fileGroups);
 }
 
+function handlePreview(url: string) {
+  previewUrl.value = url;
+  dialogPreview.value?.showModal();
+}
+
 function handleMouseDown(ev: MouseEvent) {
   (ev.target as HTMLImageElement).style.cursor = "grabbing";
 }
@@ -139,7 +146,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
             class="avatar rounded-xl transition-all"
             v-for="file in group.files"
           >
-            <div class="relative w-12">
+            <div class="relative w-12" @click="handlePreview(file.objectUrl)">
               <img
                 class="cursor-grab"
                 :src="file.objectUrl"
@@ -172,4 +179,13 @@ function handleCategoryChange(groupId: number, list: string[]) {
       </div>
     </div>
   </div>
+
+  <dialog ref="dialog_post_preview" class="modal">
+    <div class="modal-box relative max-w-full lg:max-w-8/12">
+      <img class="object-contain" :src="previewUrl" alt="preview" />
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
 </template>

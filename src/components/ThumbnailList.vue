@@ -49,13 +49,17 @@ function handleShowPreview(ev: MouseEvent) {
         v-if="showPreview"
       >
         <div
-          class="relative max-w-[80vw] lg:max-w-[50vw] shadow-xl"
+          class="relative max-w-[80vw] lg:max-w-[50vw] shadow-xl rounded-xl bg-black pt-9"
           :style="{
             width: `${previewObj?.naturalWidth ?? 0}px`,
           }"
         >
+          <span
+            class="fixed top-0 text-accent-content text-xl px-2 py-1 bg-accent rounded-br"
+            >Preview</span
+          >
           <img
-            class="object-contain rounded-xl"
+            class="object-contain"
             :src="previewObj?.src"
             alt="Preview Img"
           />
