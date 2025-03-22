@@ -42,11 +42,17 @@ function handleNewCategoryKeyEnter() {
     return;
   }
 
-  if (props.list.some((t) => t === text)) {
-    return;
+  const SEPARATE = " ";
+
+  const cs = text.split(SEPARATE).filter((t) => t !== "");
+  for (const item of cs) {
+    if (props.list.some((t) => t === item)) {
+      return;
+    }
+
+    props.list.push(item);
   }
 
-  props.list.push(text);
   newCategory.value = "";
   readyTypeNewCategory.value = false;
   emit("change", props.groupId ?? 0, props.list);
