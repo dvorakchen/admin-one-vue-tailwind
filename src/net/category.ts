@@ -34,3 +34,13 @@ export async function getAllCategories(): Promise<CategoryItem[]> {
 export function cleanCategories() {
   categoriesCache = null;
 }
+
+export async function updateCategory(
+  memeId: string,
+  list: string[]
+): Promise<void> {
+  const resp = await serverApi.put(`categories/${memeId}`, list);
+  if (resp.status !== 200) {
+    console.error("update category failed");
+  }
+}

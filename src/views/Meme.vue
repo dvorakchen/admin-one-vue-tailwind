@@ -4,11 +4,13 @@ import { serverApi } from "@/net/http";
 import type { Meme, Pagination } from "@/net/models";
 import { mdiEmoticonLol } from "@mdi/js";
 import { onMounted, reactive, ref, useTemplateRef, watch, computed } from "vue";
-import PaginationComponent from "@/components/pagination.vue";
+import PaginationComponent from "@/components/Pagination.vue";
 import PostMemes from "@/components/post-memes/Index.vue";
 import { useMsgStore } from "@/stores/msg";
 import DeleteMeme from "@/components/DeleteMeme.vue";
 import ThumbnailList from "@/components/ThumbnailList.vue";
+import PostDetail from "@/components/PostDetail.vue";
+import clone from "clone";
 
 enum FilterStatus {
   Uncensored = "Uncensored",
@@ -22,11 +24,14 @@ const msgStore = useMsgStore();
 
 const postDialog = useTemplateRef("dialog_post_memes_in_meme_list");
 const deleteDialog = useTemplateRef("dialog_delete_meme_in_meme_list");
+const detailDialog = useTemplateRef("dialog_post_detail");
 const isLoading = ref(false);
 const isPreview = ref(false);
 const page = ref(1);
 const size = 20;
 const total = ref(1);
+
+const detailMeme = ref(null as Meme | null);
 
 const list = ref([] as MemeItem[]);
 
@@ -140,6 +145,22 @@ async function handleAfterDelete(success: Meme[], fail: Meme[]) {
 
 function handleCancelDelete() {
   deleteDialog.value?.close();
+}
+
+function showDetail(id: string) {
+  detailMeme.value = list.value.find((t) => t.id === id) ?? null;
+  detailDialog.value!.checked = true;
+}
+
+function handleAfterUpdate(meme: Meme) {
+  detailMeme.value!.categories = meme.categories;
+  msgStore.pushMsg({ color: "success", value: "更新成功" });
+  detailDialog.value!.checked = false;
+}
+
+function handleCancelDetail() {
+  detailMeme.value = null;
+  detailDialog.value!.checked = false;
 }
 </script>
 
@@ -257,7 +278,12 @@ function handleCancelDelete() {
                 />
               </td>
               <th>
-                <button class="btn btn-ghost btn-xs">details</button>
+                <button
+                  class="btn btn-ghost btn-xs"
+                  @click="showDetail(meme.id)"
+                >
+                  details
+                </button>
               </th>
             </tr>
           </tbody>
@@ -303,5 +329,22 @@ function handleCancelDelete() {
         />
       </div>
     </dialog>
+
+    <input
+      type="checkbox"
+      id="dialog_post_detail"
+      ref="dialog_post_detail"
+      class="modal-toggle"
+    />
+    <div class="modal" role="dialog" v-if="detailMeme !== null">
+      <div class="modal-box">
+        <PostDetail
+          :meme="clone(detailMeme)"
+          @afterUpdate="handleAfterUpdate"
+          @cancel="handleCancelDetail"
+        />
+      </div>
+      <label class="modal-backdrop" for="dialog_post_detail">Close</label>
+    </div>
   </div>
 </template>

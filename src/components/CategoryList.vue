@@ -75,7 +75,7 @@ function handleNewCategoryKeyEnter() {
         </button>
       </span>
     </span>
-    <label class="input input-xs" v-show="readyTypeNewCategory">
+    <label class="input input-xs w-48" v-show="readyTypeNewCategory">
       <input
         ref="new-category-input"
         v-model="newCategory"
