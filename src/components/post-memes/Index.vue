@@ -6,7 +6,7 @@ import { DefaultCategory, FileItem, type FileGroup } from "./models";
 import { type PostMemeGroup, type PostMeme } from "@/net/models";
 import CollectionViewer from "./CollectionViewer.vue";
 import { getAllCategories } from "@/net/category";
-import { SuperBed, type Bed } from "@/net/bed";
+import { SuperBed, Type, type Bed } from "@/net/bed";
 import { getFileExtension } from "@/utils/file";
 import { blake3 } from "@noble/hashes/blake3";
 import aesjs from "aes-js";
@@ -34,6 +34,7 @@ onUnmounted(() => {
 });
 
 const msgStore = useMsgStore();
+const canvas = useTemplateRef("clip-cover-canvas");
 const fileInput = useTemplateRef("file-input");
 const fileGroups = ref([] as FileGroup[]);
 const loading = ref(false);
@@ -85,7 +86,9 @@ async function handlePost() {
       categories: group.categories,
       message: "",
       waitingMemes: group.files.map((file) => {
-        return postImg2Bed(bed, file.file);
+        return generateCover(file).then((base64) => {
+          return postImg2Bed(bed, file.file, base64);
+        });
       }),
       memes: [] as PostMeme[],
     };
@@ -122,10 +125,47 @@ async function handlePost() {
   loading.value = false;
 }
 
-async function postImg2Bed(bed: Bed, file: File): Promise<PostMeme> {
-  const res = await bed.postImage(file);
+function generateCover(file: FileItem): Promise<string> {
+  return new Promise((resolve) => {
+    const ext = getFileExtension(file.file.name).toUpperCase();
+    if (["GIF", "WEBP"].some((e) => ext === e)) {
+      const img = new Image();
+      img.onload = () => {
+        const can = canvas.value!;
+        can.width = img.width;
+        can.height = img.height;
+
+        const ctx = can.getContext("2d");
+        ctx!.drawImage(img, 0, 0);
+        const coverBase64 = can.toDataURL("image/png");
+
+        resolve(coverBase64);
+      };
+      img.src = file.objectUrl;
+    } else {
+      resolve("");
+    }
+  });
+}
+
+async function postImg2Bed(
+  bed: Bed,
+  file: File,
+  coverBase64: string
+): Promise<PostMeme> {
+  const res = await bed.postImage(file, Type.File);
   if (res.err !== 0) {
     throw res.msg;
+  }
+
+  let cover = "";
+  if (coverBase64 !== "") {
+    const coverRes = await bed.postImage(coverBase64, Type.Base64);
+    if (coverRes.err !== 0) {
+      await bed.deleteImagesFromUrl([res.url]);
+      throw coverRes.msg;
+    }
+    cover = coverRes.url;
   }
 
   let bytes = new Uint8Array(await file.arrayBuffer());
@@ -133,7 +173,7 @@ async function postImg2Bed(bed: Bed, file: File): Promise<PostMeme> {
 
   const p = {
     url: res.url,
-    cover: "",
+    cover,
     format: getFileExtension(res.name).toUpperCase(),
     hash,
     bed_id: res.id,
@@ -199,4 +239,6 @@ function handleCancel() {
       <span class="loading loading-xl text-primary"></span>
     </div>
   </div>
+
+  <canvas ref="clip-cover-canvas" hidden> </canvas>
 </template>

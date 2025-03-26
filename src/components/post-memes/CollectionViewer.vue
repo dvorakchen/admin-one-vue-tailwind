@@ -146,7 +146,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
             class="avatar rounded-xl transition-all"
             v-for="file in group.files"
           >
-            <div class="relative w-12" @click="handlePreview(file.objectUrl)">
+            <div class="relative w-12">
               <img
                 class="cursor-grab"
                 :src="file.objectUrl"
@@ -158,6 +158,7 @@ function handleCategoryChange(groupId: number, list: string[]) {
                 @dragover.prevent=""
                 @mousedown="handleMouseDown"
                 @mouseup="handleMouseUp"
+                @click="handlePreview(file.objectUrl)"
               />
               <button
                 class="btn btn-xs btn-circle absolute right-0 top-0 w-4 h-4"

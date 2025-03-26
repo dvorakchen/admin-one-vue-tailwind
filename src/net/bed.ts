@@ -1,5 +1,5 @@
 export interface Bed {
-  postImage(img: File): Promise<PostResult>;
+  postImage(img: File | string, type: Type): Promise<PostResult>;
   /**
    * delete images from bed
    * @param urls image urls want to delete
@@ -8,6 +8,11 @@ export interface Bed {
    * return whether successfull
    */
   deleteImagesFromUrl(urls: string[]): Promise<boolean>;
+}
+
+export enum Type {
+  File,
+  Base64,
 }
 
 export type PostResult = {
@@ -29,7 +34,7 @@ const USER_ID = import.meta.env.VITE_BED_USER_ID ?? "";
 const TOKEN = import.meta.env.VITE_BED_TOKEN ?? "";
 
 export class SuperBed implements Bed {
-  async postImage(img: File): Promise<PostResult> {
+  async postImage(img: File | string, type: Type): Promise<PostResult> {
     const ts = Date.now();
     const sign = md5(`${USER_ID}-${TOKEN}-${ts}`);
 
@@ -37,7 +42,21 @@ export class SuperBed implements Bed {
     form.append("id", USER_ID);
     form.append("ts", ts.toString());
     form.append("sign", sign);
-    form.append(`file`, img);
+
+    switch (type) {
+      case Type.File:
+        {
+          form.append(`file`, img);
+        }
+        break;
+      case Type.Base64:
+        {
+          form.append("base64", img);
+        }
+        break;
+      default:
+        throw `unknown type: ${type}`;
+    }
 
     const resp = await fetch("https://api.superbed.cn/upload", {
       method: "POST",
