@@ -49,7 +49,9 @@ async function deleteSingle(bed: Bed, meme: Meme): Promise<boolean> {
   }
 
   // delete from bed
-  const urls = meme.list.map((t) => t.url);
+  const urls = meme.list
+    .flatMap((t) => [t.url, t.cover])
+    .filter((t) => t !== "");
   await bed.deleteImagesFromUrl(urls);
 
   return true;
