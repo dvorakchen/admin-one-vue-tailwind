@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from "vue";
-import { DefaultCategory, FileItem, type FileGroup } from "./models";
+import { DefaultCategory } from "./models";
+import { type FileGroup, FileItem } from "@/net/meme";
 import CategoryList from "../CategoryList.vue";
 import Icon from "../Icon.vue";
 import { mdiClose } from "@mdi/js";

@@ -2,15 +2,11 @@
 import { mdiImagePlus } from "@mdi/js";
 import Icon from "../Icon.vue";
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from "vue";
-import { DefaultCategory, FileItem, type FileGroup } from "./models";
-import { type PostMemeGroup, type PostMeme } from "@/net/models";
+import { DefaultCategory } from "./models";
+import { type FileGroup, FileItem } from "@/net/meme";
 import CollectionViewer from "./CollectionViewer.vue";
 import { getAllCategories } from "@/net/category";
-import { SuperBed, Type, type Bed } from "@/net/bed";
-import { getFileExtension } from "@/utils/file";
-import { blake3 } from "@noble/hashes/blake3";
-import aesjs from "aes-js";
-import { serverApi } from "@/net/http";
+import { postMemes as serverPostMemes } from "@/net/meme";
 import { useMsgStore } from "@/stores/msg";
 
 function preventBodyDropEvent(ev: DragEvent) {
@@ -79,106 +75,17 @@ function handleSelectFilesChange(ev: Event) {
 async function handlePost() {
   loading.value = true;
 
-  const bed: Bed = new SuperBed();
-
-  const waitGroups = fileGroups.value.map((group) => {
-    const waitGroup = {
-      categories: group.categories,
-      message: "",
-      waitingMemes: group.files.map((file) => {
-        return generateCover(file).then((base64) => {
-          return postImg2Bed(bed, file.file, base64);
-        });
-      }),
-      memes: [] as PostMeme[],
-    };
-    return waitGroup;
-  });
-
-  for (const group of waitGroups) {
-    group.memes = await Promise.all(group.waitingMemes);
-  }
-
-  const groups = waitGroups.map((group) => {
-    return {
-      categories: group.categories,
-      message: group.message,
-      memes: group.memes,
-      username: "dvorak", // default username
-    } as PostMemeGroup;
-  });
-
-  const res = await serverApi.post("post-memes", groups);
-  if (res.status === 200) {
-    fileGroups.value = [];
+  const res = await serverPostMemes(fileGroups.value, canvas.value!);
+  if (res) {
     emit("afterPost");
   } else {
-    console.error("上传服务器失败");
     msgStore.pushMsg({
       color: "error",
       value: "提交失败",
     });
-    //  reverse bed
-    const urls = groups.flatMap((g) => g.memes.map((t) => t.url));
-    await bed.deleteImagesFromUrl(urls);
   }
+
   loading.value = false;
-}
-
-function generateCover(file: FileItem): Promise<string> {
-  return new Promise((resolve) => {
-    const ext = getFileExtension(file.file.name).toUpperCase();
-    if (["GIF", "WEBP"].some((e) => ext === e)) {
-      const img = new Image();
-      img.onload = () => {
-        const can = canvas.value!;
-        can.width = img.width;
-        can.height = img.height;
-
-        const ctx = can.getContext("2d");
-        ctx!.drawImage(img, 0, 0);
-        const coverBase64 = can.toDataURL("image/png");
-
-        resolve(coverBase64);
-      };
-      img.src = file.objectUrl;
-    } else {
-      resolve("");
-    }
-  });
-}
-
-async function postImg2Bed(
-  bed: Bed,
-  file: File,
-  coverBase64: string
-): Promise<PostMeme> {
-  const res = await bed.postImage(file, Type.File);
-  if (res.err !== 0) {
-    throw res.msg;
-  }
-
-  let cover = "";
-  if (coverBase64 !== "") {
-    const coverRes = await bed.postImage(coverBase64, Type.Base64);
-    if (coverRes.err !== 0) {
-      await bed.deleteImagesFromUrl([res.url]);
-      throw coverRes.msg;
-    }
-    cover = coverRes.url;
-  }
-
-  let bytes = new Uint8Array(await file.arrayBuffer());
-  const hash = aesjs.utils.hex.fromBytes(blake3(bytes));
-
-  const p = {
-    url: res.url,
-    cover,
-    format: getFileExtension(res.name).toUpperCase(),
-    hash,
-    bed_id: res.id,
-  } as PostMeme;
-  return p;
 }
 
 function handleCancel() {
