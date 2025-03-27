@@ -4,7 +4,7 @@ import { serverApi } from "@/net/http";
 import type { Meme, Pagination } from "@/net/models";
 import { mdiEmoticonLol } from "@mdi/js";
 import { onMounted, reactive, ref, useTemplateRef, watch, computed } from "vue";
-import PaginationComponent from "@/components/Pagination.vue";
+import PaginationComponent from "@/components/Pagination/Index.vue";
 import PostMemes from "@/components/post-memes/Index.vue";
 import { useMsgStore } from "@/stores/msg";
 import DeleteMeme from "@/components/DeleteMeme.vue";
