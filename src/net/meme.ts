@@ -61,9 +61,9 @@ function generateCover(
   file: FileItem,
   can: HTMLCanvasElement
 ): Promise<string> {
-  return new Promise((resolve) => {
-    const ext = getFileExtension(file.file.name).toUpperCase();
-    if (["GIF", "WEBP"].some((e) => ext === e)) {
+  return new Promise(async (resolve) => {
+    const res = await isAnimate(file);
+    if (res) {
       const img = new Image();
       img.onload = () => {
         can.width = img.width;
@@ -80,6 +80,36 @@ function generateCover(
       resolve("");
     }
   });
+}
+
+async function isAnimate(file: FileItem): Promise<boolean> {
+  const ext = getFileExtension(file.file.name).toUpperCase();
+
+  switch (ext) {
+    case "GIF":
+      return true;
+    case "WEBP":
+      return await isAnimateWEBP(file);
+    default:
+      return false;
+  }
+}
+
+async function isAnimateWEBP(file: FileItem): Promise<boolean> {
+  const buf = await file.file.arrayBuffer();
+  const view = new DataView(buf);
+
+  if (view.getUint32(0) !== 0x52494646) return false; // 'RIFF'
+  if (view.getUint32(8) !== 0x57454250) return false; // 'WEBP'
+
+  if (view.getUint32(12) === 0x56503858) {
+    // 'VP8X'
+    const flags = view.getUint8(16);
+    // check animate bit
+    return !!(flags & 0x02);
+  }
+
+  return false;
 }
 
 async function postImg2Bed(

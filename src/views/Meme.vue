@@ -212,6 +212,13 @@ function handleCancelDetail() {
         </div>
       </div>
 
+      <PaginationComponent
+        :page="page"
+        :total="total"
+        :loading="isLoading"
+        @click="handlePaginationChange"
+      />
+
       <div class="overflow-auto">
         <table class="table">
           <!-- head -->
@@ -301,14 +308,12 @@ function handleCancelDetail() {
           </tfoot>
         </table>
 
-        <div class="my-8 px-8">
-          <PaginationComponent
-            :page="page"
-            :total="total"
-            :loading="isLoading"
-            @click="handlePaginationChange"
-          />
-        </div>
+        <PaginationComponent
+          :page="page"
+          :total="total"
+          :loading="isLoading"
+          @click="handlePaginationChange"
+        />
       </div>
     </main>
 
