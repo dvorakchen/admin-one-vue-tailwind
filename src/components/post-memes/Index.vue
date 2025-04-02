@@ -77,6 +77,7 @@ async function handlePost() {
 
   const res = await serverPostMemes(fileGroups.value, canvas.value!);
   if (res) {
+    fileGroups.value = [];
     emit("afterPost");
   } else {
     msgStore.pushMsg({

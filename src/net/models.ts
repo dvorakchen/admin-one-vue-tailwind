@@ -37,6 +37,7 @@ export type MemeUrl = {
 export type CategoryItem = {
   id: string;
   name: string;
+  meme_count: number;
 };
 
 export type PostMemeGroup = {

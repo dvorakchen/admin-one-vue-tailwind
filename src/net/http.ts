@@ -8,7 +8,7 @@ const APPLICATION_JSON = "application/json;charset=UTF-8";
 const X_DATE = "X-Date";
 
 export const serverApi = axios.create({
-  baseURL: (import.meta as any).env.VITE_NET_BASE_URL,
+  baseURL: import.meta.env.VITE_NET_BASE_URL,
   timeout: 10_000,
   validateStatus: function (status) {
     return status < 500;

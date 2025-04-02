@@ -1,10 +1,11 @@
 import { serverApi } from "./http";
 import type { CategoryItem } from "./models";
 
-const error = [
+const error: CategoryItem[] = [
   {
     id: "",
     name: "error",
+    meme_count: 0,
   },
 ];
 
