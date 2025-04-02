@@ -26,6 +26,10 @@ onMounted(async () => {
 
 function handleRemoveCategory(value: string) {
   const list = props.list.filter((t) => t !== value);
+
+  if (list.length === 0) {
+    handleAddNewCategory();
+  }
   emit("change", props.groupId ?? 0, list);
 }
 
